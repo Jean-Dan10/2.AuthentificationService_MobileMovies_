@@ -6,7 +6,8 @@ const bcrypt = require("bcrypt");
 const axios = require("axios");
 require("dotenv").config();
 
-const secretKey = process.env.SECRET_KEY;
+// const secretKey = process.env.SECRET_KEY;
+const secretKey = "toto";
 const BASE_URL = "http://localhost:3002";
 
 router.post("/register", async (req, res) => {
@@ -58,22 +59,23 @@ router.get("/login", async (req, res) => {
       return res.status(500).json({ message: "User login failed" });
     }
 
-    console.log(response);
-    const passwordMatch = await bcrypt.compare(
-      password,
-      response.data.user.password
-    );
-    if (!passwordMatch) {
-      return res.status(401).json({ message: "Incorrect password" });
-    }
+ 
+    const token = jwt.sign({ username }, "toto", {
+      expiresIn: "1h",
+      header: { typ: undefined },
+    });
 
-    // Generate a JWT token
-    const token = jwt.sign({ username }, secretKey, { expiresIn: "1h" });
-    res.json({ token });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
+    res.cookie("token", token, {
+        httpOnly: true,
+        maxAge: 3600000, // (in milliseconds)
+        
+      });
+  
+      return res.status(200).json({ message: "Login successful" });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
 router.post("/refresh-token", (req, res) => {
   try {
