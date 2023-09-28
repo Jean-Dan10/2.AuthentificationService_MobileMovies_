@@ -76,7 +76,7 @@ router.get("/login", async (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
-  // Set the JWT token cookie to null and expire it immediately
+ 
   res.cookie("token", null, {
     httpOnly: true,
     maxAge: 0, 
