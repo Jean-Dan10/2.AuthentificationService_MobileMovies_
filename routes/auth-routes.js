@@ -59,23 +59,32 @@ router.get("/login", async (req, res) => {
       return res.status(500).json({ message: "User login failed" });
     }
 
- 
     const token = jwt.sign({ username }, "toto", {
       expiresIn: "1h",
       header: { typ: undefined },
     });
 
     res.cookie("token", token, {
-        httpOnly: true,
-        maxAge: 3600000, // (in milliseconds)
-        
-      });
-  
-      return res.status(200).json({ message: "Login successful" });
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
+      httpOnly: true,
+      maxAge: 3600000, // (in milliseconds)
+    });
+
+    return res.status(200).json({ message: "Login successful" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.post("/logout", (req, res) => {
+  // Set the JWT token cookie to null and expire it immediately
+  res.cookie("token", null, {
+    httpOnly: true,
+    maxAge: 0, 
+   
   });
+
+  return res.status(200).json({ message: "Logout successful" });
+});
 
 router.post("/refresh-token", (req, res) => {
   try {
