@@ -7,7 +7,7 @@ const authRoutes = require('./routes/auth-routes');
 app.use(bodyParser.json());
 
 // Routes
-app.use('/auth', authRoutes);
+app.use('/', authRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3010;
