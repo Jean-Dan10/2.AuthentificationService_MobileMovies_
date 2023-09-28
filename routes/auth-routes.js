@@ -36,6 +36,44 @@ router.post("/register", async (req, res) => {
   }
 });
 
+router.get("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    console.log(username);
+    console.log(password);
+
+    api_url = BASE_URL + "/users/" + username;
+    console.log(api_url);
+    const response = await axios.get(api_url, { validateStatus: false });
+    if (response.status == 200) {
+      const passwordMatch = await bcrypt.compare(
+        password,
+        response.data.user.password
+      );
+      if (!passwordMatch) {
+        return res.status(401).json({ message: "Incorrect password" });
+      }
+    } else if (response.status == 404) {
+      return res.status(404).json({ message: "User not found" });
+    } else {
+      return res.status(500).json({ message: "User login failed" });
+    }
+
+    const token = jwt.sign({ username }, "toto", {
+      expiresIn: "1h",
+      header: { typ: undefined },
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 3600000, // (in milliseconds)
+    });
+
+    return res.status(200).json({ message: "Login successful" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 router.post("/logout", (req, res) => {
  
