@@ -39,11 +39,10 @@ router.post("/register", async (req, res) => {
 router.get("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log(username);
-    console.log(password);
+ 
 
     api_url = BASE_URL + "/users/" + username;
-    console.log(api_url);
+    
     const response = await axios.get(api_url, { validateStatus: false });
     if (response.status == 200) {
       const passwordMatch = await bcrypt.compare(
