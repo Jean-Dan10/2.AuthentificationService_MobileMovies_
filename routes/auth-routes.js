@@ -62,14 +62,27 @@ router.post("/login", async (req, res) => {
       header: { typ: undefined },
     });
 
+    // Calculate the expiration time in milliseconds (1 hour in this example)
+    const expirationTimeMs = 3600000; // 1 hour in milliseconds
+
+    // Calculate the expiration date and time
+    const expirationDate = new Date(Date.now() + expirationTimeMs);
+
+    // Convert the expiration date and time to ISO 8601 format
+    const isoExpiration = expirationDate.toISOString();
+
+    // Set the cookie with the expires attribute set to the ISO 8601 string
     res.cookie("token", token, {
       httpOnly: true,
-      maxAge: 3600000, // (in milliseconds)
+      expires: expirationDate, // Use the calculated expiration date
+      domain: 'localhost', // Specify the domain as "localhost"
+      path: '/', // Specify the path as "/"
     });
-
+    
     res.cookie("username", username, {
-      httpOnly: true,
-      maxAge: 3600000, // 1 hour
+      expires: expirationDate, // Use the calculated expiration date
+      domain: 'localhost', // Specify the domain as "localhost"
+      path: '/', // Specify the path as "/"
     });
 
     return res.status(200).json({ message: "Login successful" });
@@ -78,9 +91,19 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/logout", (req, res) => {
-  res.clearCookie("token", { httpOnly: true });
-  res.clearCookie("username", { httpOnly: true });
+router.get("/logout", (req, res) => {
+  res.cookie("token", null, {
+    httpOnly: true,
+    maxAge: 0,
+    domain: 'localhost', // Specify the domain as "localhost" or your desired domain
+    path: '/', // Specify the path as "/" or your desired path
+  });
+
+  res.cookie("username", null, {
+    maxAge: 0,
+    domain: 'localhost', // Specify the domain as "localhost" or your desired domain
+    path: '/', // Specify the path as "/" or your desired path
+  });
 
   return res.status(200).json({ message: "Logout successful" });
 });
