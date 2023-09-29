@@ -5,7 +5,7 @@ const authRoutes = require('./routes/auth-routes');
 const cors = require('cors'); 
 
 const corsOptions = {
-  origin: 'http://localhost:3000', // Replace with the appropriate URL
+  origin: 'http://localhost:3000', 
   credentials: true,
 
 };

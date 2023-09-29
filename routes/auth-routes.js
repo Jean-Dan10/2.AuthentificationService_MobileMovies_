@@ -36,13 +36,12 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.get("/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
- 
 
     api_url = BASE_URL + "/users/" + username;
-    
+
     const response = await axios.get(api_url, { validateStatus: false });
     if (response.status == 200) {
       const passwordMatch = await bcrypt.compare(
@@ -68,6 +67,11 @@ router.get("/login", async (req, res) => {
       maxAge: 3600000, // (in milliseconds)
     });
 
+    res.cookie("username", username, {
+      httpOnly: true,
+      maxAge: 3600000, // 1 hour
+    });
+
     return res.status(200).json({ message: "Login successful" });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
@@ -75,12 +79,8 @@ router.get("/login", async (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
- 
-  res.cookie("token", null, {
-    httpOnly: true,
-    maxAge: 0, 
-   
-  });
+  res.clearCookie("token", { httpOnly: true });
+  res.clearCookie("username", { httpOnly: true });
 
   return res.status(200).json({ message: "Logout successful" });
 });
